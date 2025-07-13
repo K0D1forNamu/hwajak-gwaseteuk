@@ -1,0 +1,58 @@
+/* 추가 스타일 - 기본 스타일은 HTML 내에 포함되어 있음 */
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* 호버 효과 개선 */
+.form-group input:hover {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* 버튼 활성화 상태 */
+.btn:active {
+    transform: translateY(0);
+}
+
+/* 반응형 개선 */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 2em;
+    }
+    
+    .content {
+        padding: 20px;
+    }
+    
+    .form-section, .result-section {
+        padding: 20px;
+    }
+}
+
+/* 접근성 개선 */
+.form-group input:focus {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+/* 다크 모드 지원 (선택적) */
+@media (prefers-color-scheme: dark) {
+    /* 다크 모드 스타일은 필요시 추가 */
+}
+
+/* 인쇄 스타일 */
+@media print {
+    .btn, .form-section {
+        display: none;
+    }
+    
+    .result-section {
+        break-inside: avoid;
+    }
+} 

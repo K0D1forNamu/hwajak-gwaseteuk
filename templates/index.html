@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보의 처짐 시뮬레이터</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+        
+        .result-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .result-card h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.2em;
+        }
+        
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .result-unit {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .graph-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .graph-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .info-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .info-section h3 {
+            margin: 0 0 15px 0;
+            color: #1976d2;
+        }
+        
+        .info-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .examples-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e1e5e9;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .example-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e1e5e9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .example-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .example-card h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .example-card p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏗️ 보의 처짐 시뮬레이터</h1>
+            <p>등분포 하중을 받는 단순 지지보의 처짐량 계산 및 시각화</p>
+        </div>
+        
+        <div class="content">
+            {% if error %}
+            <div class="error">
+                <strong>오류:</strong> {{ error }}
+            </div>
+            {% endif %}
+            
+            <div class="form-section">
+                <h2>📊 입력값 설정</h2>
+                <form method="POST" action="{{ url_for('calculate') }}">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="length">보의 길이 (L)</label>
+                            <input type="number" id="length" name="length" step="0.1" min="0.1" 
+                                   value="{{ length if length else '4.0' }}" required>
+                            <span class="result-unit">단위: m</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="elastic_modulus">탄성계수 (E)</label>
+                            <input type="number" id="elastic_modulus" name="elastic_modulus" step="1e9" min="1e9" 
+                                   value="{{ elastic_modulus if elastic_modulus else '2.1e11' }}" required>
+                            <span class="result-unit">단위: Pa (예: 철 = 2.1×10¹¹)</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="moment_of_inertia">단면 2차 모멘트 (I)</label>
+                            <input type="number" id="moment_of_inertia" name="moment_of_inertia" step="1e-6" min="1e-6" 
+                                   value="{{ moment_of_inertia if moment_of_inertia else '8.5e-6' }}" required>
+                            <span class="result-unit">단위: m⁴</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="load">등분포 하중 (w)</label>
+                            <input type="number" id="load" name="load" step="100" min="100" 
+                                   value="{{ load if load else '5000' }}" required>
+                            <span class="result-unit">단위: N/m</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">🔬 계산하기</button>
+                </form>
+                
+                <!-- 실용적인 예시 값들 -->
+                <div class="examples-section">
+                    <h3>💡 실용적인 예시 값들</h3>
+                    <div class="examples-grid">
+                        <div class="example-card" onclick="fillExample('steel')">
+                            <h4>🏗️ 철제 보 (건축용)</h4>
+                            <p>길이: 6.0m, 탄성계수: 2.1×10¹¹ Pa</p>
+                            <p>단면: 1.2×10⁻⁵ m⁴, 하중: 8,000 N/m</p>
+                        </div>
+                        
+                        <div class="example-card" onclick="fillExample('concrete')">
+                            <h4>🌉 콘크리트 보 (교량용)</h4>
+                            <p>길이: 12.0m, 탄성계수: 3.0×10¹⁰ Pa</p>
+                            <p>단면: 5.0×10⁻⁴ m⁴, 하중: 15,000 N/m</p>
+                        </div>
+                        
+                        <div class="example-card" onclick="fillExample('wood')">
+                            <h4>🏠 목재 보 (주택용)</h4>
+                            <p>길이: 4.0m, 탄성계수: 1.2×10¹⁰ Pa</p>
+                            <p>단면: 2.5×10⁻⁶ m⁴, 하중: 2,000 N/m</p>
+                        </div>
+                        
+                        <div class="example-card" onclick="fillExample('aluminum')">
+                            <h4>⚡ 알루미늄 보 (경량)</h4>
+                            <p>길이: 3.0m, 탄성계수: 7.0×10¹⁰ Pa</p>
+                            <p>단면: 8.5×10⁻⁷ m⁴, 하중: 3,000 N/m</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if max_deflection %}
+            <div class="result-section">
+                <h2>📈 계산 결과</h2>
+                
+                <div class="result-grid">
+                    <div class="result-card">
+                        <h3>최대 처짐량</h3>
+                        <div class="result-value">{{ "%.6f"|format(max_deflection) }}</div>
+                        <div class="result-unit">단위: m</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>입력값 요약</h3>
+                        <p><strong>보의 길이:</strong> {{ "%.1f"|format(length) }} m</p>
+                        <p><strong>탄성계수:</strong> {{ "{:.1e}".format(elastic_modulus) }} Pa</p>
+                        <p><strong>단면 2차 모멘트:</strong> {{ "{:.1e}".format(moment_of_inertia) }} m⁴</p>
+                        <p><strong>등분포 하중:</strong> {{ "{:,.0f}".format(load) }} N/m</p>
+                    </div>
+                </div>
+                
+                {% if graph_url %}
+                <div class="graph-container">
+                    <h3>📊 처짐 곡선</h3>
+                    <img src="data:image/png;base64,{{ graph_url }}" alt="보의 처짐 곡선">
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="info-section">
+                <h3>ℹ️ 사용된 공식 및 이론</h3>
+                <ul>
+                    <li><strong>최대 처짐량:</strong> δ<sub>max</sub> = (5wL⁴) / (384EI)</li>
+                    <li><strong>처짐 함수:</strong> y(x) = (w/24EI)(x⁴ - 2Lx³ + L³x)</li>
+                    <li><strong>모델:</strong> 등분포 하중을 받는 단순 지지보</li>
+                    <li><strong>가정:</strong> 선형 탄성 재료, 소변형 이론</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function fillExample(type) {
+            const examples = {
+                'steel': {
+                    length: 6.0,
+                    elastic_modulus: 2.1e11,
+                    moment_of_inertia: 1.2e-5,
+                    load: 8000
+                },
+                'concrete': {
+                    length: 12.0,
+                    elastic_modulus: 3.0e10,
+                    moment_of_inertia: 5.0e-4,
+                    load: 15000
+                },
+                'wood': {
+                    length: 4.0,
+                    elastic_modulus: 1.2e10,
+                    moment_of_inertia: 2.5e-6,
+                    load: 2000
+                },
+                'aluminum': {
+                    length: 3.0,
+                    elastic_modulus: 7.0e10,
+                    moment_of_inertia: 8.5e-7,
+                    load: 3000
+                }
+            };
+            
+            const example = examples[type];
+            if (example) {
+                document.getElementById('length').value = example.length;
+                document.getElementById('elastic_modulus').value = example.elastic_modulus;
+                document.getElementById('moment_of_inertia').value = example.moment_of_inertia;
+                document.getElementById('load').value = example.load;
+                
+                // 폼 제출
+                document.querySelector('form').submit();
+            }
+        }
+    </script>
+</body>
+</html> 
